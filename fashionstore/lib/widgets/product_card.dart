@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:fashionstore/models/product_model.dart';
 import 'package:fashionstore/screens/product_detail_screen.dart';
 import 'package:fashionstore/utils/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -26,19 +27,18 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Ảnh sản phẩm (Dùng Expanded để tự động chiếm phần không gian còn lại)
+          // ===== ẢNH ĐÃ ĐƯỢC THAY BẰNG CACHED NETWORK IMAGE =====
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: Image.network(
-                product.imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: product.imageUrl,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                ),
+                errorWidget: (context, url, error) => Container(
                   color: Colors.grey[200],
                   child: const Icon(Icons.broken_image, color: Colors.grey, size: 40),
                 ),
@@ -46,7 +46,7 @@ class ProductCard extends StatelessWidget {
             ),
           ),
 
-          // 2. Thông tin sản phẩm (Đã giới hạn số dòng để chống tràn)
+          // Thông tin sản phẩm (giữ nguyên, đã fix tràn dòng)
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -60,7 +60,7 @@ class ProductCard extends StatelessWidget {
                 Text(
                   product.name,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  maxLines: 1, // ⬅️ Fix lỗi không tràn tên
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
@@ -83,7 +83,7 @@ class ProductCard extends StatelessWidget {
             ),
           ),
 
-          // 3. Nút xem chi tiết
+          // Nút xem chi tiết
           SizedBox(
             width: double.infinity,
             child: TextButton(

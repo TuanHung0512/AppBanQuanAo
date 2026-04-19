@@ -6,7 +6,6 @@ import 'package:fashionstore/screens/admin/admin_orders_screen.dart';
 import 'package:fashionstore/utils/constants.dart';
 
 class AdminMainScreen extends StatelessWidget {
-  // RxInt được khai báo ở đây (không dùng const constructor)
   final RxInt currentIndex = 0.obs;
 
   AdminMainScreen({super.key});   // ← ĐÃ BỎ 'const' ở đây

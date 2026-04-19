@@ -11,9 +11,9 @@ class InvoiceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String bankBin = '970422';
-    const String bankAccount = '0123456789';
-    const String accountName = 'FASHION STORE';
+    const String bankBin = '970436';
+    const String bankAccount = '1028805664';
+    const String accountName = 'VUONG TUAN HUNG';
 
     final String shortOrderId = orderId.substring(0, 6).toUpperCase();
     final String addInfo = 'Thanh toan don $shortOrderId';
