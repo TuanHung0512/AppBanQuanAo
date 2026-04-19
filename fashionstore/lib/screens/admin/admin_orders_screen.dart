@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 class AdminOrdersScreen extends StatelessWidget {
   const AdminOrdersScreen({super.key});
 
-  // SỬA Ở ĐÂY: static const để tương thích với const constructor
   static const List<String> statuses = [
     'Chờ thanh toán',
     'Đã thanh toán',

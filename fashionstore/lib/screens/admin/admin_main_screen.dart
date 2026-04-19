@@ -8,7 +8,7 @@ import 'package:fashionstore/utils/constants.dart';
 class AdminMainScreen extends StatelessWidget {
   final RxInt currentIndex = 0.obs;
 
-  AdminMainScreen({super.key});   // ← ĐÃ BỎ 'const' ở đây
+  AdminMainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

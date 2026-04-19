@@ -8,7 +8,7 @@ import 'package:fashionstore/screens/login_screen.dart';
 import 'package:fashionstore/screens/auth/register_screen.dart';
 import 'package:fashionstore/screens/home_screen.dart';
 import 'package:fashionstore/utils/constants.dart';
-import 'firebase_options.dart';   // File này sẽ được tạo sau khi chạy flutterfire configure
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      initialRoute: '/login',           // Màn hình đầu tiên
+      initialRoute: '/login',           
       getPages: [
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/register', page: () => RegisterScreen()),

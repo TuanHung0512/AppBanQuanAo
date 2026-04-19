@@ -34,7 +34,6 @@ class AdminProductsScreen extends StatelessWidget {
     File? selectedImage;
     bool isUploading = false;
 
-    // THAY Get.defaultDialog BẰNG Get.dialog VÀ CUSTOM LẠI TỪ ĐẦU ĐỂ BỎ MÀU VÀNG
     Get.dialog(
       StatefulBuilder(
         builder: (context, setState) {
