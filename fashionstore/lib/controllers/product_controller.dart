@@ -38,7 +38,7 @@ class ProductController extends GetxController {
 
     _service.getProducts().listen(
           (data) {
-        timeoutTimer.cancel(); // Hủy timeout khi có dữ liệu
+        timeoutTimer.cancel();
         products.value = data;
         isLoading.value = false;
         hasError.value = false;

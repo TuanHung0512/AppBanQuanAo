@@ -1,5 +1,5 @@
 name: fashionstore
-description: App bán quần áo Nhóm 20
+description: App bán quần áo Flutter + Firebase
 publish_to: 'none'
 
 version: 1.0.0+1

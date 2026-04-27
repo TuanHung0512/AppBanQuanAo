@@ -4,21 +4,22 @@ import 'package:get/get.dart';
 import 'package:fashionstore/controllers/auth_controller.dart';
 import 'package:fashionstore/controllers/product_controller.dart';
 import 'package:fashionstore/controllers/cart_controller.dart';
+
+// ===== IMPORT ĐÚNG =====
 import 'package:fashionstore/screens/login_screen.dart';
-import 'package:fashionstore/screens/auth/register_screen.dart';
-import 'package:fashionstore/screens/home_screen.dart';
+import 'package:fashionstore/screens/signup_screen.dart';
+import 'package:fashionstore/screens/home_screen.dart';        // ← ĐÃ THÊM
+import 'package:fashionstore/screens/main_screen.dart';
 import 'package:fashionstore/utils/constants.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Khởi tạo các Controller (permanent: true để không bị xóa khi chuyển màn hình)
   Get.put(AuthController(), permanent: true);
   Get.put(ProductController(), permanent: true);
   Get.put(CartController(), permanent: true);
@@ -45,11 +46,12 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      initialRoute: '/login',           
+      initialRoute: '/login',
       getPages: [
-        GetPage(name: '/login', page: () => LoginScreen()),
-        GetPage(name: '/register', page: () => RegisterScreen()),
-        GetPage(name: '/home', page: () => HomeScreen()),
+        GetPage(name: '/login', page: () => LoginScreen()),      // ← BỎ const
+        GetPage(name: '/register', page: () => SignupScreen()),  // ← BỎ const
+        GetPage(name: '/home', page: () => HomeScreen()),        // ← BỎ const
+        GetPage(name: '/main', page: () => MainScreen()),        // ← BỎ const
       ],
     );
   }

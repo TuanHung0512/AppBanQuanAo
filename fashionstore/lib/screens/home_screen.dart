@@ -19,11 +19,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 0;
 
   final List<String> _banners = [
-    'https://picsum.photos/id/1015/800/400',
-    'https://picsum.photos/id/133/800/400',
-    'https://picsum.photos/id/201/800/400',
-    'https://picsum.photos/id/251/800/400',
-    'https://picsum.photos/id/1005/800/400',
+    'https://wallpaperaccess.com/full/4599521.jpg',
+    'https://wallpaperaccess.com/full/4599570.jpg',
+    'https://i.mdel.net/mdx/i/2011/09/P9295123-1280w-sfw-1024x697.jpg',
   ];
 
   @override

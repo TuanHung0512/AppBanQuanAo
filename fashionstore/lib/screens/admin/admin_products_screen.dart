@@ -58,7 +58,6 @@ class AdminProductsScreen extends StatelessWidget {
                     ),
                     const Divider(height: 30),
 
-                    // Các ô nhập liệu được làm mới với border góc cạnh
                     TextField(
                       controller: nameCtrl,
                       decoration: InputDecoration(

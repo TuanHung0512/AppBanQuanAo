@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -71,6 +73,152 @@ class AdminDashboardScreen extends StatelessWidget {
                       ],
                     );
                   },
+                );
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // ===== NÚT XUẤT EXCEL =====
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: _exportToCsv,
+                icon: const Icon(Icons.download_rounded, color: Colors.white),
+                label: const Text(
+                  'Xuất doanh thu ra Excel (CSV)',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF11998E),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 4,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ===== SẢN PHẨM BÁN CHẠY NHẤT =====
+            const Text(
+              'Sản phẩm bán chạy nhất',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0B1B3F)),
+            ),
+            const SizedBox(height: 16),
+
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+              builder: (context, orderSnap) {
+                if (!orderSnap.hasData) {
+                  return const Center(child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ));
+                }
+
+                final orders = orderSnap.data!.docs;
+                if (orders.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                    ),
+                    child: const Center(child: Text('Chưa có đơn hàng nào để phân tích')),
+                  );
+                }
+
+                // Tính sản phẩm bán chạy
+                Map<String, int> productSales = {};
+                for (var doc in orders) {
+                  final items = (doc.data() as Map<String, dynamic>)['items'] as List<dynamic>? ?? [];
+                  for (var item in items) {
+                    if (item is Map) {
+                      final name = item['name'] as String? ?? 'Sản phẩm không rõ';
+                      final qty = (item['quantity'] as num?)?.toInt() ?? 0;
+                      productSales[name] = (productSales[name] ?? 0) + qty;
+                    }
+                  }
+                }
+
+                final sorted = productSales.entries.toList()
+                  ..sort((a, b) => b.value.compareTo(a.value));
+                final top5 = sorted.take(5).toList();
+
+                if (top5.isEmpty) {
+                  return const Text('Chưa có dữ liệu bán hàng');
+                }
+
+                return Column(
+                  children: top5.asMap().entries.map((entry) {
+                    final rank = entry.key + 1;
+                    final productName = entry.value.key;
+                    final sold = entry.value.value;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        leading: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: rank == 1
+                                ? const Color(0xFFFFD700)
+                                : rank == 2
+                                ? const Color(0xFFC0C0C0)
+                                : rank == 3
+                                ? const Color(0xFFCD7F32)
+                                : Colors.grey[200],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '#$rank',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: rank <= 3 ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          productName,
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF11998E).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '$sold lượt',
+                            style: const TextStyle(
+                              color: Color(0xFF11998E),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 );
               },
             ),
@@ -165,7 +313,7 @@ class AdminDashboardScreen extends StatelessWidget {
 
             Center(
               child: Text(
-                'Chúc bạn quản trị vui vẻ! 🎉',
+                'Chào mứng Vương Tuấn Hưng đã trở lại! 🎉',
                 style: TextStyle(fontSize: 16, color: Colors.grey[400]),
               ),
             ),
@@ -291,5 +439,111 @@ class AdminDashboardScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // ===== HÀM XUẤT CSV DOANH THU (Dán trực tiếp vào Excel) =====
+  Future<void> _exportToCsv() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        Get.snackbar(
+          'Thông báo',
+          'Chưa có đơn hàng nào để xuất!',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      final buffer = StringBuffer();
+      buffer.writeln('Mã đơn hàng,Khách hàng,Tổng tiền (đ),Trạng thái,Ngày tạo');
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final orderId = doc.id;
+        final customer = (data['customerEmail'] ?? 'Không rõ').toString();
+        final total = (data['totalAmount'] as num?)?.toDouble() ?? 0;
+        final status = (data['status'] ?? 'Chờ thanh toán').toString();
+        final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+        final dateStr = createdAt != null
+            ? '${createdAt.day.toString().padLeft(2, '0')}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.year}'
+            : '';
+
+        final safeCustomer = customer.replaceAll('"', '""');
+        buffer.writeln('"$orderId","$safeCustomer",${total.toStringAsFixed(0)},"$status","$dateStr"');
+      }
+
+      final csvContent = buffer.toString();
+      await Clipboard.setData(ClipboardData(text: csvContent));
+
+      Get.snackbar(
+        ' Đã copy thành công!',
+        'Đã copy ${snapshot.docs.length} đơn hàng vào clipboard.\nMở Excel → Paste (Ctrl+V)',
+        backgroundColor: const Color(0xFF11998E),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 6),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      Get.dialog(
+        Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.table_chart, color: Color(0xFF11998E), size: 28),
+                    SizedBox(width: 12),
+                    Text('Dữ liệu CSV đã sẵn sàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 160,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F9FA),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      csvContent.length > 550
+                          ? csvContent.substring(0, 550) + '\n...(còn lại)'
+                          : csvContent,
+                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, height: 1.4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF11998E),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text('Đóng', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể xuất: $e', backgroundColor: Colors.redAccent, colorText: Colors.white);
+    }
   }
 }

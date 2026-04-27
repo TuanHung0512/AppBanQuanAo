@@ -14,10 +14,6 @@ class AuthController extends GetxController {
   Rx<AppUser?> currentUser = Rx<AppUser?>(null);
   static const String ADMIN_EMAIL = 'admin@fashionstore.com';
 
-  // Lưu mật khẩu mới sau khi đổi (demo - không gửi mail)
-  RxString demoPassword = ''.obs;
-  RxString demoEmail = ''.obs;
-
   @override
   void onInit() {
     super.onInit();
@@ -46,27 +42,13 @@ class AuthController extends GetxController {
   }
 
   void showForgotPasswordDialog() {
-    Get.to(() => const ResetPasswordScreen());
+    Get.to(() => ResetPasswordScreen());
   }
 
   Future<void> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       Get.snackbar('Thiếu thông tin', 'Vui lòng nhập đầy đủ email và mật khẩu',
           snackPosition: SnackPosition.TOP, backgroundColor: Colors.orange, colorText: Colors.white);
-      return;
-    }
-
-    // ===== KIỂM TRA MẬT KHẨU MỚI SAU KHI ĐỔI (QUAN TRỌNG) =====
-    if (demoPassword.value.isNotEmpty &&
-        demoEmail.value == email &&
-        password == demoPassword.value) {
-      currentUser.value = AppUser(
-        uid: 'demo-uid',
-        email: email,
-        name: email.split('@')[0],
-        isAdmin: email.toLowerCase() == ADMIN_EMAIL.toLowerCase(),
-      );
-      Get.offAll(() => MainScreen());
       return;
     }
 
@@ -99,6 +81,35 @@ class AuthController extends GetxController {
       Get.snackbar('Lỗi', message, snackPosition: SnackPosition.TOP, backgroundColor: Colors.redAccent, colorText: Colors.white);
     } catch (e) {
       Get.snackbar('Lỗi', e.toString(), snackPosition: SnackPosition.TOP);
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    if (email.isEmpty) {
+      Get.snackbar('Lỗi', 'Vui lòng nhập email của bạn',
+          snackPosition: SnackPosition.TOP, backgroundColor: Colors.orange, colorText: Colors.white);
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      Get.snackbar(
+        'Thành công',
+        'Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư (kể cả thư mục spam) và làm theo hướng dẫn.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 6),
+      );
+      Get.back();
+    } on FirebaseAuthException catch (e) {
+      String message = 'Không thể gửi email đặt lại mật khẩu';
+      if (e.code == 'user-not-found') message = 'Email chưa được đăng ký';
+      else if (e.code == 'invalid-email') message = 'Email không hợp lệ';
+      else if (e.code == 'too-many-requests') message = 'Bạn đã yêu cầu quá nhiều lần. Vui lòng thử lại sau.';
+      Get.snackbar('Lỗi', message, snackPosition: SnackPosition.TOP, backgroundColor: Colors.redAccent, colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể kết nối đến máy chủ. Vui lòng thử lại.', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 

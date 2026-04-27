@@ -1,133 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fashionstore/controllers/auth_controller.dart';
-import 'package:fashionstore/screens/login_screen.dart';
 import 'package:fashionstore/utils/constants.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
-
-  @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
-}
-
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class ResetPasswordScreen extends StatelessWidget {
+  final AuthController authController = Get.find<AuthController>();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController codeController = TextEditingController();
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
 
-  String? generatedCode;
-  bool isLoading = false;
-
-  void generateCode() {
-    setState(() {
-      generatedCode = (10000 + DateTime.now().millisecondsSinceEpoch % 90000).toString();
-    });
-  }
-
-  void resetPassword() {
-    final email = emailController.text.trim();
-    final code = codeController.text.trim();
-    final newPass = newPasswordController.text.trim();
-    final confirmPass = confirmPasswordController.text.trim();
-
-    if (email.isEmpty || code.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
-      Get.snackbar('Lỗi', 'Vui lòng điền đầy đủ thông tin', backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-    if (code != generatedCode) {
-      Get.snackbar('Lỗi', 'Mã xác nhận không đúng', backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-    if (newPass != confirmPass) {
-      Get.snackbar('Lỗi', 'Mật khẩu xác nhận không khớp', backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-    if (newPass.length < 6) {
-      Get.snackbar('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự', backgroundColor: Colors.red, colorText: Colors.white);
-      return;
-    }
-
-    setState(() => isLoading = true);
-
-    final auth = Get.find<AuthController>();
-    auth.demoPassword.value = newPass;
-    auth.demoEmail.value = email;
-
-    Future.delayed(const Duration(milliseconds: 800), () {
-      setState(() => isLoading = false);
-      Get.snackbar('Thành công', 'Mật khẩu đã được đặt lại! Vui lòng đăng nhập lại.', backgroundColor: Colors.green, colorText: Colors.white);
-      Get.offAll(() => LoginScreen());   // ← QUAY VỀ LOGIN
-    });
-  }
+  ResetPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Đặt Lại Mật Khẩu'), backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+      appBar: AppBar(
+        title: const Text('Quên mật khẩu'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            Center(child: Icon(Icons.lock_reset, size: 80, color: AppColors.primary)),
+            const SizedBox(height: 40),
+            Icon(Icons.lock_reset_rounded, size: 90, color: AppColors.primary),
             const SizedBox(height: 24),
-            const Center(child: Text('Đặt Lại Mật Khẩu', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
-            const SizedBox(height: 8),
-            const Center(child: Text('Tạo mã và nhập mật khẩu mới', style: TextStyle(color: Colors.grey))),
-            const SizedBox(height: 32),
+            const Text(
+              'Đặt lại mật khẩu',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Nhập email đã đăng ký của bạn.\nChúng tôi sẽ gửi link đặt lại mật khẩu qua email.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.5),
+            ),
+            const SizedBox(height: 40),
 
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: 'Email', prefixIcon: const Icon(Icons.email), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'example@email.com',
+                prefixIcon: const Icon(Icons.email_outlined),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                filled: true,
+                fillColor: Colors.grey[50],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 28),
 
-            ElevatedButton(
-              onPressed: generatedCode == null ? generateCode : null,
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, minimumSize: const Size(double.infinity, 50)),
-              child: Text(generatedCode == null ? 'TẠO MÃ XÁC NHẬN' : 'MÃ ĐÃ TẠO'),
-            ),
-
-            if (generatedCode != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.green)),
-                child: Column(
-                  children: [
-                    const Text('Mã xác nhận của bạn:', style: TextStyle(color: Colors.green)),
-                    const SizedBox(height: 8),
-                    SelectableText(generatedCode!, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFFDB2777))),
-                  ],
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  elevation: 2,
+                ),
+                onPressed: () {
+                  authController.resetPassword(emailController.text.trim());
+                },
+                child: const Text(
+                  'GỬI LINK ĐẶT LẠI MẬT KHẨU',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 24),
+            ),
 
-              TextField(controller: codeController, decoration: InputDecoration(labelText: 'Nhập mã xác nhận', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-              const SizedBox(height: 16),
-              TextField(controller: newPasswordController, obscureText: true, decoration: InputDecoration(labelText: 'Mật khẩu mới', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-              const SizedBox(height: 16),
-              TextField(controller: confirmPasswordController, obscureText: true, decoration: InputDecoration(labelText: 'Xác nhận mật khẩu mới', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-              const SizedBox(height: 32),
-
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : resetPassword,
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  child: isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('ĐẶT LẠI MẬT KHẨU', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text(
+                'Quay lại màn hình đăng nhập',
+                style: TextStyle(color: AppColors.primary, fontSize: 15),
               ),
-            ],
+            ),
 
-            const SizedBox(height: 16),
-            Center(child: TextButton(onPressed: () => Get.back(), child: const Text('Quay lại', style: TextStyle(color: AppColors.primary)))),
+            const SizedBox(height: 30),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Link có hiệu lực trong 1 giờ. Nếu không nhận được email, hãy kiểm tra thư mục Spam hoặc thử lại sau 5 phút.',
+                      style: TextStyle(fontSize: 13, color: Colors.blueGrey),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

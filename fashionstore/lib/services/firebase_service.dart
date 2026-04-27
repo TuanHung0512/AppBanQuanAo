@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// Đảm bảo đường dẫn import này đúng với cấu trúc thư mục của bạn
 import 'package:fashionstore/models/product_model.dart';
 
 class FirebaseService {
