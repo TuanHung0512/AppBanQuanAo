@@ -4,7 +4,7 @@ class Product {
   final String description;
   final double price;
   final String imageUrl;
-  final String category;
+  final String category; // Áo thun, Quần jeans...
   final List<String> sizes;
   final List<String> colors;
 

@@ -30,7 +30,6 @@ class AdminDashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
 
-            // ===== THỐNG KÊ SẢN PHẨM + ĐƠN HÀNG + DOANH THU =====
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance.collection('products').snapshots(),
               builder: (context, productSnap) {
@@ -79,27 +78,24 @@ class AdminDashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ===== NÚT XUẤT EXCEL =====
             Center(
-              child: ElevatedButton.icon(
+              child: ElevatedButton(
                 onPressed: _exportToCsv,
-                icon: const Icon(Icons.download_rounded, color: Colors.white),
-                label: const Text(
-                  'Xuất doanh thu ra Excel (CSV)',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF11998E),
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
                 ),
+                child: const Text(
+                  'Xuất doanh thu ra Excel (CSV)',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // ===== SẢN PHẨM BÁN CHẠY NHẤT =====
             const Text(
               'Sản phẩm bán chạy nhất',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0B1B3F)),
@@ -129,10 +125,16 @@ class AdminDashboardScreen extends StatelessWidget {
                   );
                 }
 
-                // Tính sản phẩm bán chạy
                 Map<String, int> productSales = {};
                 for (var doc in orders) {
-                  final items = (doc.data() as Map<String, dynamic>)['items'] as List<dynamic>? ?? [];
+                  final data = doc.data() as Map<String, dynamic>;
+                  final status = data['status']?.toString() ?? '';
+
+                  if (status != 'Đã thanh toán' && status != 'Hoàn thành') {
+                    continue;
+                  }
+
+                  final items = data['items'] as List<dynamic>? ?? [];
                   for (var item in items) {
                     if (item is Map) {
                       final name = item['name'] as String? ?? 'Sản phẩm không rõ';
@@ -147,7 +149,14 @@ class AdminDashboardScreen extends StatelessWidget {
                 final top5 = sorted.take(5).toList();
 
                 if (top5.isEmpty) {
-                  return const Text('Chưa có dữ liệu bán hàng');
+                  return Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Center(child: Text('Chưa có đơn hàng nào đã thanh toán/hoàn thành')),
+                  );
                 }
 
                 return Column(
@@ -225,7 +234,6 @@ class AdminDashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // ===== PHÂN TÍCH ĐÁNH GIÁ SẢN PHẨM =====
             const Text(
               'Phân tích đánh giá',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -278,7 +286,6 @@ class AdminDashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Phân bố sao
                     ...List.generate(5, (index) {
                       int star = 5 - index;
                       int count = starCount[star] ?? 0;
@@ -313,7 +320,7 @@ class AdminDashboardScreen extends StatelessWidget {
 
             Center(
               child: Text(
-                'Chào mứng Vương Tuấn Hưng đã trở lại! 🎉',
+                'Chào mừng VTH quay trở lại! 🎉',
                 style: TextStyle(fontSize: 16, color: Colors.grey[400]),
               ),
             ),
@@ -441,7 +448,6 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  // ===== HÀM XUẤT CSV DOANH THU (Dán trực tiếp vào Excel) =====
   Future<void> _exportToCsv() async {
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -481,7 +487,7 @@ class AdminDashboardScreen extends StatelessWidget {
       await Clipboard.setData(ClipboardData(text: csvContent));
 
       Get.snackbar(
-        ' Đã copy thành công!',
+        '✅ Đã copy thành công!',
         'Đã copy ${snapshot.docs.length} đơn hàng vào clipboard.\nMở Excel → Paste (Ctrl+V)',
         backgroundColor: const Color(0xFF11998E),
         colorText: Colors.white,
@@ -498,12 +504,9 @@ class AdminDashboardScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.table_chart, color: Color(0xFF11998E), size: 28),
-                    SizedBox(width: 12),
-                    Text('Dữ liệu CSV đã sẵn sàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
+                const Text(
+                  'Dữ liệu CSV đã sẵn sàng',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
                 Container(
@@ -524,6 +527,7 @@ class AdminDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                const Text('💡 Paste vào Excel/Google Sheets để xem đẹp!', style: TextStyle(fontSize: 13, color: Colors.grey)),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,

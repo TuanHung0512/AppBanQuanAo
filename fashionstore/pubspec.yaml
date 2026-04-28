@@ -19,6 +19,8 @@ dependencies:
   google_sign_in: ^6.2.1
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
+  path_provider: ^2.1.2
+  share_plus: ^7.2.1
 
   mailer: ^6.1.0
 

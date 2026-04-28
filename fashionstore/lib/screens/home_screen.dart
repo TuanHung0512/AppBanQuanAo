@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 0;
 
   final List<String> _banners = [
+    'https://scontent.fhan9-1.fna.fbcdn.net/v/t39.30808-6/550305934_1383829357077943_1870842637479551856_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=109&ccb=1-7&_nc_sid=2a1932&_nc_eui2=AeHM6OL3EdH6CAQuiJD7zUlQFIDehR0TyTIUgN6FHRPJMt4o3I8vNmjvCV0iLI0QwxD4ruZKV_22MOXDR-pgj6WY&_nc_ohc=u6fdpRJMZZsQ7kNvwHS2vQO&_nc_oc=AdrImoAcLzqktCilao2_cTwxH6YbwRSlAtW_NeNQA4gAquTmjtC9vMCsKZBGzp5PpFQ&_nc_zt=23&_nc_ht=scontent.fhan9-1.fna&_nc_gid=mVXrDGt3zhnOeskoYLcy2Q&_nc_ss=7b2a8&oh=00_Af1cMTSKwEFsRsf7gnErS3TQoIKUh8HfSeubQ5oZp9ygNg&oe=69F66409',
     'https://wallpaperaccess.com/full/4599521.jpg',
     'https://wallpaperaccess.com/full/4599570.jpg',
     'https://i.mdel.net/mdx/i/2011/09/P9295123-1280w-sfw-1024x697.jpg',
@@ -151,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         alignment: Alignment.bottomLeft,
                         padding: const EdgeInsets.all(16),
                         child: const Text(
-                          'Sale Hot\nGiảm đến 50%',
+                          'Dự án\nFashion Store VTH',
                           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ),

@@ -42,7 +42,7 @@ class AuthController extends GetxController {
   }
 
   void showForgotPasswordDialog() {
-    Get.to(() => ResetPasswordScreen());
+    Get.to(() => ResetPasswordScreen());   // ← ĐÃ BỎ const
   }
 
   Future<void> login(String email, String password) async {
