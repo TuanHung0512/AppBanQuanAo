@@ -19,11 +19,21 @@ class CartScreen extends StatelessWidget {
             itemCount: cartController.cartItems.length,
             itemBuilder: (context, index) {
               final item = cartController.cartItems[index];
+
               return ListTile(
                 leading: Image.network(item.product.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
                 title: Text(item.product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
                 subtitle: Text('${item.size} • ${item.color} • SL: ${item.quantity}'),
-                trailing: Text('${item.total.toStringAsFixed(0)}đ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('${item.total.toStringAsFixed(0)}đ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    IconButton(
+                      onPressed: () => cartController.removeFromCart(index),
+                      icon: const Icon(Icons.close, color: Colors.red),
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -54,12 +64,11 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: cartController.isProcessing.value
-                      ? null
-                      : () => cartController.checkout(),
+                  onPressed: cartController.isProcessing.value ? null : () => cartController.checkout(),
                   child: cartController.isProcessing.value
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Tạo Hóa Đơn & Thanh Toán', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                      : const Text('Tạo Hóa Đơn & Thanh Toán',
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

@@ -15,57 +15,149 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.dark,
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.shopping_bag, size: 100, color: AppColors.primary),
-              const SizedBox(height: 32),
-              const Text('ĐĂNG NHẬP', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 32),
-
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(labelText: 'Email', prefixIcon: const Icon(Icons.email), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true, fillColor: Colors.grey[50]),
+              Center(
+                child: Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1.2),
+                    shape: BoxShape.circle,
+                    color: Colors.black,
+                    boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.25), blurRadius: 30, spreadRadius: 1)],
+                  ),
+                  child: const Icon(Icons.shopping_bag_rounded, size: 52, color: AppColors.primary),
+                ),
               ),
-              const SizedBox(height: 16),
 
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(labelText: 'Mật khẩu', prefixIcon: const Icon(Icons.lock), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true, fillColor: Colors.grey[50]),
+              const SizedBox(height: 50),
+
+              const Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'FASHION STORE',
+                      style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900, letterSpacing: 4),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'ENTER THE DARK SIDE OF FASHION',
+                      style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 3, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(height: 55),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.4), width: 1),
+                ),
+                child: TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+                    prefixIcon: const Icon(Icons.alternate_email_rounded, color: AppColors.primary),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.4), width: 1),
+                ),
+                child: TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
 
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => authController.showForgotPasswordDialog(),
-                  child: const Text('Quên mật khẩu?', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w500)),
+                  child: const Text(
+                    'QUÊN MẬT KHẨU?',
+                    style: TextStyle(color: Colors.white54, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 28),
 
               Obx(() => SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 58,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                   onPressed: isLoading.value ? null : () async {
                     isLoading.value = true;
-                    await authController.login(_emailController.text.trim(), _passwordController.text.trim());
+                    await authController.login(
+                      _emailController.text.trim(),
+                      _passwordController.text.trim(),
+                    );
                     isLoading.value = false;
                   },
-                  child: isLoading.value ? const CircularProgressIndicator(color: Colors.white) : const Text('ĐĂNG NHẬP', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: isLoading.value
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                    'ĐĂNG NHẬP',
+                    style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 3),
+                  ),
                 ),
               )),
 
-              const SizedBox(height: 16),
-              TextButton(onPressed: () => Get.to(() => SignupScreen()), child: const Text('Chưa có tài khoản? Đăng ký ngay', style: TextStyle(color: AppColors.primary))),
+              const SizedBox(height: 28),
+
+              Center(
+                child: TextButton(
+                  onPressed: () => Get.to(() => SignupScreen()),
+                  child: RichText(
+                    text: const TextSpan(
+                      text: 'THÀNH VIÊN MỚI? ',
+                      style: TextStyle(color: Colors.white38, letterSpacing: 1),
+                      children: [
+                        TextSpan(
+                          text: 'HÃY TẠO TÀI KHOẢN',
+                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, letterSpacing: 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

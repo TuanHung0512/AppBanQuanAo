@@ -21,6 +21,11 @@ class CartController extends GetxController {
     Get.snackbar('Thành công', 'Đã thêm vào giỏ hàng');
   }
 
+  void removeFromCart(int index) {
+    cartItems.removeAt(index);
+    Get.snackbar('Đã xóa', 'Sản phẩm đã được xóa khỏi giỏ hàng');
+  }
+
   double get totalPrice => cartItems.fold(0, (sum, item) => sum + item.total);
 
   Future<void> checkout() async {

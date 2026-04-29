@@ -38,7 +38,7 @@ class ProfileScreen extends StatelessWidget {
                 title: const Text('Quản trị', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 subtitle: const Text('Vào Admin Panel'),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-                onTap: () => Get.to(() => AdminMainScreen()),   // ← KHÔNG DÙNG const
+                onTap: () => Get.to(() => AdminMainScreen()),
               ),
 
             const Divider(),
