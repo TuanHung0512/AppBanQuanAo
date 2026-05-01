@@ -20,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> _banners = [
     'https://scontent.fhan9-1.fna.fbcdn.net/v/t39.30808-6/550305934_1383829357077943_1870842637479551856_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=109&ccb=1-7&_nc_sid=2a1932&_nc_eui2=AeHM6OL3EdH6CAQuiJD7zUlQFIDehR0TyTIUgN6FHRPJMt4o3I8vNmjvCV0iLI0QwxD4ruZKV_22MOXDR-pgj6WY&_nc_ohc=u6fdpRJMZZsQ7kNvwHS2vQO&_nc_oc=AdrImoAcLzqktCilao2_cTwxH6YbwRSlAtW_NeNQA4gAquTmjtC9vMCsKZBGzp5PpFQ&_nc_zt=23&_nc_ht=scontent.fhan9-1.fna&_nc_gid=10I_6Bf-O6wU6YzZ94c4iA&_nc_ss=7b2a8&oh=00_Af3P-s-3Q2PbKKWXtMPiLorIb87fjXzyccCSWgBumeMVLQ&oe=69F69C49',
-    'https://wallpaperaccess.com/full/4599521.jpg',
     'https://i.pinimg.com/736x/98/83/79/988379d4acd3d5338ed345d0b4ec009d.jpg',
     'https://i.mdel.net/mdx/i/2011/09/P9295123-1280w-sfw-1024x697.jpg',
   ];

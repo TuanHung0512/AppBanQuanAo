@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:flutter/services.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -31,18 +34,23 @@ class AdminDashboardScreen extends StatelessWidget {
             const SizedBox(height: 28),
 
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('products').snapshots(),
+              stream: FirebaseFirestore.instance.collection('products')
+                  .snapshots(),
               builder: (context, productSnap) {
-                final productCount = productSnap.hasData ? productSnap.data!.docs.length : 0;
+                final productCount = productSnap.hasData ? productSnap.data!
+                    .docs.length : 0;
 
                 return StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+                  stream: FirebaseFirestore.instance.collection('orders')
+                      .snapshots(),
                   builder: (context, orderSnap) {
-                    final orderCount = orderSnap.hasData ? orderSnap.data!.docs.length : 0;
+                    final orderCount = orderSnap.hasData ? orderSnap.data!.docs
+                        .length : 0;
                     double revenue = 0;
                     if (orderSnap.hasData) {
                       for (var doc in orderSnap.data!.docs) {
-                        revenue += (doc['totalAmount'] as num?)?.toDouble() ?? 0;
+                        revenue +=
+                            (doc['totalAmount'] as num?)?.toDouble() ?? 0;
                       }
                     }
 
@@ -80,16 +88,19 @@ class AdminDashboardScreen extends StatelessWidget {
 
             Center(
               child: ElevatedButton(
-                onPressed: _exportToCsv,
+                onPressed: _exportToExcel,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF11998E),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
                 ),
                 child: const Text(
                   'Xuất doanh thu ra Excel (CSV)',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -98,12 +109,15 @@ class AdminDashboardScreen extends StatelessWidget {
 
             const Text(
               'Sản phẩm bán chạy nhất',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0B1B3F)),
+              style: TextStyle(fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0B1B3F)),
             ),
             const SizedBox(height: 16),
 
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+              stream: FirebaseFirestore.instance.collection('orders')
+                  .snapshots(),
               builder: (context, orderSnap) {
                 if (!orderSnap.hasData) {
                   return const Center(child: Padding(
@@ -119,9 +133,12 @@ class AdminDashboardScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                      boxShadow: [
+                        BoxShadow(color: Colors.black12, blurRadius: 8)
+                      ],
                     ),
-                    child: const Center(child: Text('Chưa có đơn hàng nào để phân tích')),
+                    child: const Center(
+                        child: Text('Chưa có đơn hàng nào để phân tích')),
                   );
                 }
 
@@ -137,7 +154,8 @@ class AdminDashboardScreen extends StatelessWidget {
                   final items = data['items'] as List<dynamic>? ?? [];
                   for (var item in items) {
                     if (item is Map) {
-                      final name = item['name'] as String? ?? 'Sản phẩm không rõ';
+                      final name = item['name'] as String? ??
+                          'Sản phẩm không rõ';
                       final qty = (item['quantity'] as num?)?.toInt() ?? 0;
                       productSales[name] = (productSales[name] ?? 0) + qty;
                     }
@@ -155,12 +173,16 @@ class AdminDashboardScreen extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(child: Text('Chưa có đơn hàng nào đã thanh toán/hoàn thành')),
+                    child: const Center(child: Text(
+                        'Chưa có đơn hàng nào đã thanh toán/hoàn thành')),
                   );
                 }
 
                 return Column(
-                  children: top5.asMap().entries.map((entry) {
+                  children: top5
+                      .asMap()
+                      .entries
+                      .map((entry) {
                     final rank = entry.key + 1;
                     final productName = entry.value.key;
                     final sold = entry.value.value;
@@ -179,7 +201,8 @@ class AdminDashboardScreen extends StatelessWidget {
                         ],
                       ),
                       child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         leading: Container(
                           width: 48,
                           height: 48,
@@ -199,19 +222,22 @@ class AdminDashboardScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: rank <= 3 ? Colors.white : Colors.black87,
+                                color: rank <= 3 ? Colors.white : Colors
+                                    .black87,
                               ),
                             ),
                           ),
                         ),
                         title: Text(
                           productName,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 16),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         trailing: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             color: const Color(0xFF11998E).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -241,9 +267,11 @@ class AdminDashboardScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('reviews').snapshots(),
+              stream: FirebaseFirestore.instance.collection('reviews')
+                  .snapshots(),
               builder: (context, reviewSnap) {
-                if (!reviewSnap.hasData) return const CircularProgressIndicator();
+                if (!reviewSnap.hasData)
+                  return const CircularProgressIndicator();
 
                 final reviews = reviewSnap.data!.docs;
                 if (reviews.isEmpty) {
@@ -289,13 +317,15 @@ class AdminDashboardScreen extends StatelessWidget {
                     ...List.generate(5, (index) {
                       int star = 5 - index;
                       int count = starCount[star] ?? 0;
-                      double percent = reviews.isNotEmpty ? (count / reviews.length) * 100 : 0;
+                      double percent = reviews.isNotEmpty ? (count /
+                          reviews.length) * 100 : 0;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(
                           children: [
-                            Text('$star★', style: const TextStyle(fontSize: 16)),
+                            Text(
+                                '$star★', style: const TextStyle(fontSize: 16)),
                             const SizedBox(width: 12),
                             Expanded(
                               child: LinearProgressIndicator(
@@ -448,51 +478,85 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _exportToCsv() async {
+  Future<void> _exportToExcel() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('orders')
-          .orderBy('createdAt', descending: true)
-          .get();
+      final snapshot = await FirebaseFirestore.instance.collection('orders').orderBy('createdAt', descending: true).get();
 
       if (snapshot.docs.isEmpty) {
-        Get.snackbar(
-          'Thông báo',
-          'Chưa có đơn hàng nào để xuất!',
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-        );
+        Get.snackbar('Thông báo', 'Chưa có đơn hàng nào để xuất!', backgroundColor: Colors.orange, colorText: Colors.white);
         return;
       }
 
-      final buffer = StringBuffer();
-      buffer.writeln('Mã đơn hàng,Khách hàng,Tổng tiền (đ),Trạng thái,Ngày tạo');
+      final excel = Excel.createExcel();
+      final Sheet sheet = excel['DoanhThu'];
+      double totalRevenue = 0;
+
+      sheet.appendRow([
+        TextCellValue('Mã đơn hàng'),
+        TextCellValue('Khách hàng'),
+        TextCellValue('Tổng tiền'),
+        TextCellValue('Trạng thái'),
+        TextCellValue('Ngày tạo'),
+      ]);
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
+
         final orderId = doc.id;
         final customer = (data['customerEmail'] ?? 'Không rõ').toString();
         final total = (data['totalAmount'] as num?)?.toDouble() ?? 0;
         final status = (data['status'] ?? 'Chờ thanh toán').toString();
         final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+
+        totalRevenue += total;
+
         final dateStr = createdAt != null
             ? '${createdAt.day.toString().padLeft(2, '0')}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.year}'
             : '';
 
-        final safeCustomer = customer.replaceAll('"', '""');
-        buffer.writeln('"$orderId","$safeCustomer",${total.toStringAsFixed(0)},"$status","$dateStr"');
+        sheet.appendRow([
+          TextCellValue(orderId),
+          TextCellValue(customer),
+          DoubleCellValue(total),
+          TextCellValue(status),
+          TextCellValue(dateStr),
+        ]);
       }
 
-      final csvContent = buffer.toString();
-      await Clipboard.setData(ClipboardData(text: csvContent));
+      sheet.appendRow([]);
+
+      sheet.appendRow([
+        TextCellValue('TỔNG DOANH THU'),
+        TextCellValue(''),
+        DoubleCellValue(totalRevenue),
+      ]);
+
+      sheet.setColumnWidth(0, 25);
+      sheet.setColumnWidth(1, 30);
+      sheet.setColumnWidth(2, 18);
+      sheet.setColumnWidth(3, 20);
+      sheet.setColumnWidth(4, 18);
+
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = 'bao_cao_doanh_thu_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+      final filePath = '${directory.path}/$fileName';
+
+      final fileBytes = excel.encode();
+
+      if (fileBytes == null) {
+        throw Exception('Không thể tạo file Excel');
+      }
+
+      final file = File(filePath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes);
 
       Get.snackbar(
-        '✅ Đã copy thành công!',
-        'Đã copy ${snapshot.docs.length} đơn hàng vào clipboard.\nMở Excel → Paste (Ctrl+V)',
+        '✅ Thành công',
+        'Đã tạo file Excel!',
         backgroundColor: const Color(0xFF11998E),
         colorText: Colors.white,
-        duration: const Duration(seconds: 6),
-        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 4),
       );
 
       Get.dialog(
@@ -502,43 +566,51 @@ class AdminDashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Icon(Icons.description, color: Color(0xFF11998E), size: 70),
+                const SizedBox(height: 16),
+
                 const Text(
-                  'Dữ liệu CSV đã sẵn sàng',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'Xuất Excel thành công!',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 16),
-                Container(
-                  height: 160,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      csvContent.length > 550
-                          ? csvContent.substring(0, 550) + '\n...(còn lại)'
-                          : csvContent,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, height: 1.4),
-                    ),
-                  ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  fileName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.grey),
                 ),
-                const SizedBox(height: 16),
-                const Text('💡 Paste vào Excel/Google Sheets để xem đẹp!', style: TextStyle(fontSize: 13, color: Colors.grey)),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 24),
+
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Get.back(),
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      await Share.shareXFiles([XFile(file.path)], text: 'Báo cáo doanh thu');
+                    },
+                    icon: const Icon(Icons.share, color: Colors.white),
+                    label: const Text(
+                      'Chia sẻ / Tải file',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF11998E),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Đóng', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    child: const Text('Đóng'),
                   ),
                 ),
               ],
@@ -547,7 +619,12 @@ class AdminDashboardScreen extends StatelessWidget {
         ),
       );
     } catch (e) {
-      Get.snackbar('Lỗi', 'Không thể xuất: $e', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+        'Lỗi',
+        'Không thể xuất Excel: $e',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     }
   }
 }
